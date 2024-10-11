@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book List</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Library Book List 📚</h1>
+        <!-- Search form -->
+        <form method="GET" action="{% url 'search_books' %}" class="search-form">
+            <input type="text" name="q" placeholder="Search books by title or author" value="{{ request.GET.q }}">
+            <button type="submit">Search</button>
+        </form>
+ 
+        <!-- Success/Error messages -->
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p class="message {{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <center>
+            <a href="{% url 'create_book' %}">
+                <button class="btn btn-premium">Add New Book</button>
+            </a>
+            <a href="{% url 'transaction_list' %}">
+                <button class="btn btn-premium">Transaction List</button>
+            </a>
+            <a href="{% url 'create_member' %}">
+                <button class="btn btn-premium">Add New Member</button>
+            </a>
+            <a href="{% url 'member_list' %}">
+                <button class="btn btn-premium">Members List</button>
+            </a>
+        </center>
+
+        <br>
+        <!-- Book List Table -->
+        <table class="book-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>ISBN</th>
+                    <th>Publisher</th>
+                    <th>Page Count</th>
+                    <th>Available</th>
+                    <th>Actions</th>
+                    <th>Issue Book</th>
+                    <th>Transaction</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.authors }}</td>
+                    <td>{{ book.isbn }}</td>
+                    <td>{{ book.publisher }}</td>
+                    <td>{{ book.page_count }}</td>
+                    <td>{% if book.available %}Yes{% else %}No{% endif %}</td>
+                    <td>
+                        <a href="{% url 'update_book' book.id %}" class="btn">Edit</a><br>
+                        <a href="{% url 'delete_book' book.id %}" class="btn btn-delete" onclick="return confirm('Are you sure?')">Delete</a><br>
+                    </td>
+                    <td>
+                        {% if book.available %}
+                            <a href="{% url 'issue_book' book.id %}" class="btn btn-issue">Issue Book</a>
+                        {% else %}
+                            <span class="unavailable">Not Available</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if book.transaction_set.exists and book.available == 0 %}
+                            <a href="{% url 'return_book' book.transaction_set.first.id %}" class="btn btn-return">Return Book</a>
+                        {% else %}
+                            <span>No active transactions</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">No books found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+<style>
+ /* General Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(100deg, #FF6B6B, lightyellow, blue); /* Red, Blue, Violet gradient */
+    margin: 0;
+    padding: 0;
+    transition: background 0.3s;
+}
+
+.container {
+    max-width: 960px;
+    margin: 20px auto;
+    padding: 50px;
+    background: linear-gradient(100deg, #FF6B6B, lightyellow, blue); /* Fixed missing semicolon */
+
+    box-shadow: 0 4px 40px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* Premium button styling */
+.btn-premium {
+    background: linear-gradient(135deg, #FF6B6B, #FFD93D);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+/* Button hover effect */
+.btn-premium:hover {
+    background: linear-gradient(135deg, #FFD93D, #FF6B6B);
+    transform: scale(1.05);
+}
+
+/* Ripple effect on click */
+.btn-premium:active::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 50%;
+    animation: ripple 0.6s ease-out;
+}
+
+/* Heading */
+h1 {
+    text-align: center;
+    color: black; /* Change heading color for better visibility */
+    margin-bottom: 20px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Search Form */
+.search-form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.search-form input[type="text"] {
+    padding: 10px;
+    width: 300px;
+    border: 2px solid #007bff;
+    border-radius: 4px;
+    margin-right: 10px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-form input[type="text"]:focus {
+    border-color: #0056b3;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.search-form button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.search-form button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+/* Messages */
+.messages {
+    margin-bottom: 20px;
+}
+
+.message {
+    padding: 10px;
+    border-radius: 4px;
+    transition: transform 0.3s;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    transform: translateY(-5px);
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    transform: translateY(-5px);
+}
+
+/* Table */
+.book-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff; /* Change table background color */
+    animation: fadeIn 0.5s ease-out;
+}
+
+.book-table th, .book-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.book-table th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+.book-table tr:nth-child(even) {
+    background-color: #e9ecef; /* Change color for even rows */
+}
+
+.book-table tr:hover {
+    background-color: #d1e7dd; /* Light teal hover effect */
+    transform: scale(1.02); /* Lift effect on hover */
+}
+
+/* Buttons */
+.btn {
+    text-decoration: none;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #FFD93D, #FF6B6B); /* Gradient background for edit button */
+    color: white;
+    border-radius: 4px;
+    display: inline-block;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, #FFB347, #FF5252); /* Hover effect with gradient */
+    transform: translateY(-2px);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Delete button styling */
+.btn-delete {
+    background: linear-gradient(135deg, #FF5733, #C70039); /* Gradient for delete button */
+}
+
+.btn-delete:hover {
+    background: linear-gradient(135deg, #E74C3C, #B03A2E); /* Darker hover gradient */
+    transform: translateY(-2px);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Issue button styling */
+.btn-issue {
+    background: linear-gradient(135deg, #1E90FF, #00CFFF); /* Gradient for issue button */
+}
+
+.btn-issue:hover {
+    background: linear-gradient(135deg, #1C86EE, #00B2E2); /* Hover effect with gradient */
+    transform: translateY(-2px);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Return button styling */
+.btn-return {
+    background: linear-gradient(135deg, #FFD700, #FFC700); /* Gradient for return button */
+}
+
+.btn-return:hover {
+    background: linear-gradient(135deg, #FFC700, #E68A00); /* Hover effect with gradient */
+    transform: translateY(-2px);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Unavailable text styling */
+.unavailable {
+    color: #ff0000;
+    font-weight: bold;
+}
+
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes ripple {
+    to {
+        transform: translate(-50%, -50%) scale(4);
+        opacity: 0;
+    }
+}
+
+/* Additional Animations */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Apply bounce animation on hover for buttons */
+.btn:hover {
+    animation: bounce 0.5s forwards;
+}
+
+.btn-premium:hover {
+    animation: bounce 0.5s forwards;
+}
+
+
+</style>
