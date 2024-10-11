@@ -58,6 +58,7 @@ API: Frappe Library API for book data imports
 🗂️ Project Structure
 bash
 Copy code
+
 📦 Library Management System
 ├── 📁 books
 │   ├── 📄 models.py        # Book model definitions
@@ -76,8 +77,8 @@ Copy code
 ├── 📄 README.md             # Project documentation
 └── 📄 manage.py             # Django management file
 🔧 Installation & Setup
-Clone the repository:
 
+Clone the repository:
 bash
 Copy code
 git clone https://github.com/yourusername/library-management-system.git
@@ -102,18 +103,9 @@ Access the system at http://127.0.0.1:8000/.
 🌐 API Usage
 You can import books into the system using the Frappe Library API as described in the "Frappe Library API Integration" section.
 
-📸 Screenshots
-Book Management
-![Library Dashboard](https://github.com/harini/Library_Management/blob/main/screenshots/screenshot(134).png)
-
-
-Member Management
-![Library Dashboard](https://github.com/harini/Library_Management/blob/main/screenshots/screenshot(137).png)
-
-
 
 🤝 Contributing
-Contributions are welcome! Feel free to open issues or submit pull requests. To contribute:
+Contributions are welcome! Feel free to open issues or submit pull requests.
 
 Fork the repository.
 Create a new feature branch.
