@@ -27,7 +27,7 @@ Database: MySQL
 
 
 🤝 Contributing
-Contributions are welcome!
+Contributions are welcome Guys !
 To contribute:
 
 Fork the repository.
